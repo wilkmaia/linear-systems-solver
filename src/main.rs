@@ -98,7 +98,7 @@ fn ajuste_de_matrizes<'a>( mut a: &'a mut Vec<Vec<f64>>, mut b: &'a mut Vec<f64>
 	let mut i: usize = 0;
 	while i < n {
 		// Encontra o maior valor da coluna, em módulo
-		let mut _max: f64 = 0f64;
+		let mut _max: f64 = a[i][i].abs();
 		let mut lin: usize = i;
 		let mut j: usize = i + 1;
 		while j < n {
@@ -157,10 +157,10 @@ fn metodo_de_gauss<'a>( mut a: &'a mut Vec<Vec<f64>>, mut b: &'a mut Vec<f64>, m
 		// Atualização da linha 'i'
 		let mut _i = 0;
 		while _i < n {
-			a[i][_i] = m * a[k][_i] + a[i][_i];
+			a[i][_i] += m * a[k][_i];
 			_i += 1;
 		}
-		b[i] = m * b[k] + b[i];
+		b[i] += m * b[k];
 		
 		z += 1;
 		i += 1;
@@ -206,11 +206,12 @@ fn metodos_iterativos<'a>( a: &'a Vec<Vec<f64>>, b: &'a Vec<f64>, mut x: &'a mut
 	loop {
 		let mut i: usize = 0;
 
-		// Soma das parcelas a[i][j] * x[i]
+		// Cálculo da resposta para a i-ésima iteração
 		while i < n {
 			let mut sum: f64 = 0f64;
 			let mut j = 0;
 
+			// Soma das parcelas a[i][j] * x[j]
 			while j < n {
 				// O termo a[i][i] será o denominador da expressão
 				// Não entra na soma
@@ -225,7 +226,7 @@ fn metodos_iterativos<'a>( a: &'a Vec<Vec<f64>>, b: &'a Vec<f64>, mut x: &'a mut
 				// Isto quer dizer que para a etapa i1 > i0 desta soma, o valor de x a ser utilizado
 				// é o valor calculado na mesma iteração (y[j]), ao invés de x[j], que representa 
 				// a iteração anterior.
-				sum += a[i][j] * ( if method == 2 { x[j] } else { y[j] } );
+				sum = sum + a[i][j] * ( if method == 2 { x[j] } else { y[j] } );
 
 				j += 1;
 			}
@@ -253,7 +254,7 @@ fn metodos_iterativos<'a>( a: &'a Vec<Vec<f64>>, b: &'a Vec<f64>, mut x: &'a mut
 		*x = y.to_vec();
 
 		*z += 1;
-		
+
 		// Caso o sistema tenha convergido
 		if flag == true {
 			break;
@@ -334,7 +335,7 @@ fn main() {
 	// Fim da execução do método proposto e da medição do tempo gasto
 	
 	// Exibição do tempo de execução e do método aplicado
-	println!( "Tempo de execução: {} ns", dt );
+	println!( "Tempo de execução: {} us", dt/1000 );
 	println!( "Método: {}", method );
 
 	
@@ -354,6 +355,7 @@ fn main() {
 	}
 
 	// println!( "{:?}", a ); // DEBUG
+	// println!( "{:?}", b ); // DEBUG
 
 
 	// Escrita no arquivo de saída
